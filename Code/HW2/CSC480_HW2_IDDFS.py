@@ -1,7 +1,7 @@
 #python 3.9.16
 #Nicholas Ragano
 #10/18/2023
-#this program uses a custom graph structure (that will also be used and perhaps mildly adjusted in the A* program) along with complete data set that allows the nodes and paths to be mapped
+#this program uses a custom graph structure along with complete data set that allows the nodes and paths to be mapped
 #it will then output the best path from Class Room Building A to the Conference Center
 
 

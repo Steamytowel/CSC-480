@@ -1,6 +1,6 @@
 #python 3.9.16
 #Nicholas Ragano
-#10/18/2023
+#10/19/2023
 #I wrote this one second and decided to change the structure of the adjacency lists and node lists into one new NodeDict
 #   this was to make it easier to use, read and understand. it also allowed one structure to hold the the necessary information
 #this program uses a custom node and graph structure that contains the essentials for an AStar program
