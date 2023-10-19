@@ -60,7 +60,7 @@ class Structure:
     def loadFrontier(self, frontier, node):
         for each in node.adj:
             #for all adjacent nodes we have not yet visited
-            if(each[0].visited == False):
+            if(each[0].visited == False and (each[0] not in [n[0] for n in frontier])):
                 if(each[0].parent == None):
                     each[0].parent = node
                 f_entry = (each[0], each[0].h_distance + each[1])
@@ -70,30 +70,46 @@ class Structure:
     
 
     def AStar(self, start, goal):
-        res = [start]
-        if(start == goal):
+        res = [start]       #add our start to the path
+        if(start == goal):  #check that we didnt start at the goal
             return res
-        frontier = self.loadFrontier([],start)
+        start.visited = True
+        frontier = self.loadFrontier([],start) #load the frontier with nodes adjacent to the current node
         while(frontier):
-            currentNode = frontier.pop()[0]
-            res.append(currentNode)
+            currentNode = frontier.pop()[0] #get the smallest from the pqueue
+            res.append(currentNode) #add it to the current path and mark visited
             currentNode.visited = True
-            if(currentNode == goal):
+            if(currentNode == goal):    #check if we are at the goal
                 return res
-            frontier = self.loadFrontier(frontier, currentNode)
-            if(len(frontier) > 0):
-                nextSmallest = frontier[-1]
+            #if we arent then we should go about selecting the next smallest frontier node
+            frontier = self.loadFrontier(frontier, currentNode) #load the frontier with nodes adjacent to the current node
+
+            if(len(frontier) > 0):  #if the frontier pqueue is empty then we cant make it to the goal
+                nextSmallest = frontier[-1] #peek at the next smallest node on the frontier
                 if(nextSmallest[0] in [x[0] for x in currentNode.adj]):
                     #if the next smallest node on the frontier is adjacent to the current node
+                    #   then we can continue right along as normal
                     continue
                 else:
-                    #we need to go find the parent of the next frontier node
-                    for each in res[::-1]:
-                        if(nextSmallest[0].parent == each):
-                            #our path is now corrected and we can continue
-                            break
+                    #if it isnt then we need to go to the next smallest node and reconstruct the path back to start
+                    
+                    at_start = False
+                    tempNode = nextSmallest[0]
+                    res = []
+                    while(at_start == False):
+                        if(tempNode.parent == None):
+                            at_start = True
                         else:
-                            res.pop()
+                            tempNode = tempNode.parent
+                            res.append(tempNode)
+                    res.reverse()
+
+                    # for each in res[::-1]:
+                    #     if(nextSmallest[0].parent == each):
+                    #         #our path is now corrected and we can continue
+                    #         break
+                    #     else:
+                    #         res.pop()
             else:
                 #no more left to try, we failed
                 return 'failure'
