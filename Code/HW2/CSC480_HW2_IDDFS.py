@@ -8,13 +8,13 @@
 import sys
 #list of each node and its associated x,y value
 NodeList = [
-    ("Class Room Building A",0,291),
-    ("Class Room Building B",0,149),
-    ("Student Commons",71,220),
-    ("Transportation Hub",271,220),
-    ("Administration Building",306,255),
-    ("Faculty Office Building",342,149),
-    ("Conference Center",182,29)
+    ("Class Room Building A"),
+    ("Class Room Building B"),
+    ("Student Commons"),
+    ("Transportation Hub"),
+    ("Administration Building"),
+    ("Faculty Office Building"),
+    ("Conference Center")
 ]
 
 # list of edges
@@ -30,15 +30,10 @@ AdjList = [
 
 
 class Node:
-    def __init__(self,name,x,y):
+    def __init__(self,name):
         self.name = name
-        self.x = x
-        self.y = y
         self.visited = False
         self.adj = [] #(node name, path cost)
-    
-    def getName(self):
-        return self.name
 
 class Graph:
     def __init__(self):
@@ -51,10 +46,6 @@ class Graph:
     def addEdge(self,NodeA,NodeB,Cost):
         self.nodes[NodeA].adj.append((NodeB,Cost))
         self.nodes[NodeB].adj.append((NodeA,Cost))
-
-    def printEdges(self):
-        for node in self.nodes:
-            print(self.nodes[node].name, ": ", self.nodes[node].adj)
 
     def DLS(self,Start,Goal,Limit):
         depth = 0
@@ -93,7 +84,7 @@ class Graph:
         return 'cutoff' 
 
 
-    def IDFFS(self,Start,Goal,maxDepth = sys.maxsize): #returns a list
+    def IDDFS(self,Start,Goal,maxDepth = sys.maxsize): #returns a list
         for i in range(0,maxDepth):
             for each in self.nodes:
                 self.nodes[each].visited = False
@@ -105,17 +96,17 @@ class Graph:
         #if we reach the max depth with no results we return no valid path
         return 'no valid path'
 
-
+####ITERATIVE DEEPINING DEPTH FIRST SEARCH####
 #create our graph and add each node
 graph = Graph()
 for n in NodeList:
-    graph.addNode(Node(n[0],n[1],n[2]))  #Node(name,x,y)
+    graph.addNode(Node(n))  #Node(name)
 
 for each in AdjList:
     graph.addEdge(each[0],each[1],each[2])
 
 #Start Node, Goal Node, OPTIONAL depth limit (default value is sys.maxsize)
-res = graph.IDFFS(graph.nodes["Class Room Building A"], graph.nodes["Conference Center"])
+res = graph.IDDFS(graph.nodes["Class Room Building A"], graph.nodes["Conference Center"])
 if(res != 'no valid path'):
     print([x.name for x in res])
 else:
