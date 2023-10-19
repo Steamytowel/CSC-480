@@ -28,6 +28,15 @@ AdjList = [
     ("Faculty Office Building", "Conference Center", 200)
 ]
 
+NodeDict = {
+    'Class Room Building A': {'adj': [('Student Commons', 100)], 'x': 0, 'y': 291},
+    'Class Room Building B': {'adj': [('Student Commons', 100)], 'x': 0, 'y': 149},
+    'Student Commons': {'adj': [('Class Room Building A',100),('Class Room Building B',100),('Transportation Hub',200),('Administration Building',275)], 'x': 71, 'y': 220},
+    'Transportation Hub': {'adj': [('Student Commons',200), ('Administration Building', 50), ('Faculty Office Building', 100)], 'x': 271, 'y': 220},
+    'Administration Building': {'adj': [('Student Commons', 275),('Transportation Hub', 50)], 'x': 306, 'y': 255},
+    'Faculty Office Building': {'adj': [('Transportation Hub',100), ('Conference Center', 200)], 'x': 342, 'y': 149},
+    'Conference Center': {'adj': [('Faculty Office Building', 200)], 'x': 182, 'y': 29}
+}
 
 class Node:
     def __init__(self,name,x,y):
@@ -36,7 +45,7 @@ class Node:
         self.y = y
         self.visited = False
         self.h_distance = -1
-        self.parent = None
+        self.parent = []
         self.adj = [] #(node name, path cost)
     
 
@@ -54,15 +63,14 @@ class Structure:
 
     def setHDistances(self,Goal):
         for each in self.nodes:
-            node = self.node[each]
+            node = self.nodes[each]
             node.h_distance = math.sqrt(pow((Goal.x - node.x),2) + pow((Goal.y - node.y),2))
 
     def loadFrontier(self, frontier, node):
         for each in node.adj:
-            #for all adjacent nodes we have not yet visited
+            #for all adjacent nodes we have not yet visited that are not already in the frontier
             if(each[0].visited == False and (each[0] not in [n[0] for n in frontier])):
-                if(each[0].parent == None):
-                    each[0].parent = node
+                each[0].parent.append(node)
                 f_entry = (each[0], each[0].h_distance + each[1])
                 frontier.append(f_entry)
         frontier.sort(reverse = True, key = lambda x:x[1])
@@ -70,6 +78,7 @@ class Structure:
     
 
     def AStar(self, start, goal):
+        self.setHDistances(goal)
         res = [start]       #add our start to the path
         if(start == goal):  #check that we didnt start at the goal
             return res
@@ -97,19 +106,19 @@ class Structure:
                     tempNode = nextSmallest[0]
                     res = []
                     while(at_start == False):
-                        if(tempNode.parent == None):
+                        if(len(tempNode.parent) == 0):
                             at_start = True
                         else:
-                            tempNode = tempNode.parent
-                            res.append(tempNode)
+                            if(len(tempNode.parent) > 1):
+                                #if there is more than one node that could be a parent
+                                #choose the parent with the smallest g distance
+                                tempNode = min(tempNode.parent, key = lambda x: x.h_distance)
+                                    
+                            else:
+                                tempNode = tempNode.parent[0]
+                                res.append(tempNode)
                     res.reverse()
 
-                    # for each in res[::-1]:
-                    #     if(nextSmallest[0].parent == each):
-                    #         #our path is now corrected and we can continue
-                    #         break
-                    #     else:
-                    #         res.pop()
             else:
                 #no more left to try, we failed
                 return 'failure'
@@ -123,7 +132,7 @@ for node in NodeList:
 for each in AdjList:
     struct.addEdge(each[0], each[1], each[2])
 
-res = struct.AStar(struct.nodes["Class Room Building A"], struct.nodes["Conference Center"])
+res = struct.AStar(struct.nodes["Class Room Building A"], struct.nodes["Administration Building"])
 if(res != 'failure'):
     print([x.name for x in res])
 else:
